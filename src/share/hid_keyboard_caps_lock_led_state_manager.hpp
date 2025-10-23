@@ -94,6 +94,14 @@ private:
       return;
     }
 
+    // DISABLED: LED updates cause keyboard freeze when USB bus is congested (3x USB monitors).
+    // The IOHIDDeviceSetValueWithCallback call triggers sync IOKit call kIOHIDLibUserClientPostElementValues
+    // which gets timeout (0xe00002d6) when USB is busy, blocking keyboard event processing.
+    // Disabling LED updates fixes freeze - caps lock LED won't work but keyboard will be responsive.
+    // See: https://github.com/pqrs-org/Karabiner-Elements/issues/XXXX
+
+    return; // Skip LED updates to avoid USB timeout freeze
+
     // macOS 10.12 sometimes synchronize caps lock LED to internal keyboard caps lock state.
     // The behavior causes LED state mismatch because
     // the caps lock state of karabiner_grabber is independent from the hardware caps lock state.
